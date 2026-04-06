@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Consultoras dōTERRA — Formulário</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #FAF7F2;
+    --warm: #F2EBE0;
+    --gold: #C8963E;
+    --gold-light: #E8C97A;
+    --brown: #6B4F35;
+    --brown-dark: #3D2B1A;
+    --green: #3A5C4A;
+    --green-light: #EAF2EC;
+    --text: #2C1F13;
+    --text-muted: #8C7060;
+    --white: #FFFFFF;
+    --radius: 14px;
+  }
+
+  html, body {
+    min-height: 100%;
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 560px;
+    position: relative;
+  }
+
+  /* Progress */
+  .progress-wrap {
+    width: 100%;
+    height: 3px;
+    background: var(--warm);
+    border-radius: 99px;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* Screens */
+  .screen {
+    display: none;
+    flex-direction: column;
+    gap: 1.75rem;
+    animation: rise 0.5s cubic-bezier(.4,0,.2,1) both;
+  }
+  .screen.active { display: flex; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Step label */
+  .step-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* Question */
+  .question {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1.35;
+    color: var(--brown-dark);
+  }
+  .question em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-top: -0.75rem;
+  }
+
+  /* Input */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .tf-input {
+    background: var(--white);
+    border: 1.5px solid var(--warm);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  .tf-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(200,150,62,0.12);
+  }
+  .tf-input::placeholder { color: #C4AFA0; }
+
+  /* Choices */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--white);
+    border: 1.5px solid var(--warm);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--text);
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    user-select: none;
+  }
+  .choice:hover {
+    border-color: var(--gold-light);
+    background: #FDF9F4;
+    transform: translateX(3px);
+  }
+  .choice.selected {
+    border-color: var(--gold);
+    background: #FDF5E6;
+    color: var(--brown-dark);
+  }
+  .choice .badge {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background: var(--warm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+  }
+  .choice.selected .badge {
+    background: var(--gold);
+    color: var(--white);
+  }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 10px; align-items: center; }
+
+  .btn-next {
+    background: var(--gold);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, opacity 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-next:hover:not(:disabled) { background: var(--brown); }
+  .btn-next:active:not(:disabled) { transform: scale(0.97); }
+  .btn-next:disabled { opacity: 0.35; cursor: default; }
+
+  .btn-back {
+    background: transparent;
+    border: 1.5px solid var(--warm);
+    border-radius: var(--radius);
+    padding: 13px 18px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-back:hover { background: var(--warm); border-color: transparent; }
+
+  /* Opening screen */
+  .opening-icon {
+    font-size: 36px;
+    line-height: 1;
+  }
+  .opening-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 30px;
+    font-weight: 300;
+    line-height: 1.3;
+    color: var(--brown-dark);
+  }
+  .opening-title span { color: var(--gold); font-style: italic; }
+  .opening-body {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 99px;
+  }
+
+  /* Disqualified */
+  .disq-box {
+    background: var(--white);
+    border: 1.5px solid var(--warm);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+  .disq-box .icon { font-size: 40px; }
+  .disq-box h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--brown-dark);
+  }
+  .disq-box p { font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 340px; }
+
+  /* End screen */
+  .end-box {
+    background: linear-gradient(145deg, #FDF5E6, #FDF9F4);
+    border: 1.5px solid var(--gold-light);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+  }
+  .end-box .icon { font-size: 44px; }
+  .end-box h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--brown-dark);
+    line-height: 1.3;
+  }
+  .end-box p { font-size: 15px; color: var(--text-muted); line-height: 1.7; max-width: 360px; }
+  .end-box .highlight {
+    background: var(--green-light);
+    color: var(--green);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+    max-width: 340px;
+  }
+
+  /* Qual financeira destaque */
+  .qual-card {
+    background: var(--white);
+    border: 1.5px solid var(--warm);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .qual-card strong { color: var(--brown-dark); display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .qual-card ul { padding-left: 1.2rem; }
+  .qual-card ul li { margin-bottom: 4px; }
+
+  /* Watermark */
+  .watermark {
+    margin-top: 2.5rem;
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.5;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="progress-wrap">
+    <div class="progress-bar" id="pbar" style="width: 0%"></div>
+  </div>
+
+  <!-- ETAPA 1: Abertura -->
+  <div class="screen active" id="s0">
+    <div class="opening-icon">🌿</div>
+    <div class="opening-title">Consultora <span>dōTERRA</span>, você quer parar de depender só de <strong>indicação</strong> e ir pra um próximo nível na <strong>captação</strong>?</div>
+    <div class="opening-body">Se você quer receber de <strong>forma automática</strong> novas <strong>conversas todos os dias</strong> no <strong>Whatsapp</strong> e atrair mulheres certas para o seu negócio — esse formulário é pra você.<br><br><strong style="color:var(--brown-dark); font-size:16px;">Prrencha ele clicando no botão abaixo</strong></div>
+    <div>
+      <span class="pill">🕐 Menos de 1 minuto</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" onclick="go(1)">Quero começar →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 2: Nome -->
+  <div class="screen" id="s1">
+    <div class="step-label">Pergunta 1 de 9</div>
+    <div class="question">Qual é o seu <em>nome</em>? 👋</div>
+    <div class="field">
+      <input class="tf-input" id="q-nome" type="text" placeholder="Digite seu nome..." autocomplete="given-name" />
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn1" onclick="go(2)" disabled>Próximo →</button>
+      <button class="btn-back" onclick="go(0)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 3: Consultora ativa? -->
+  <div class="screen" id="s2">
+    <div class="step-label">Pergunta 2 de 9</div>
+    <div class="question"><span id="nome-s2"></span>, você é consultora <em>dōTERRA ativa</em> hoje?</div>
+    <div class="choices" id="q-ativa">
+      <div class="choice" onclick="pick(this,'q-ativa','sim')"><span class="badge">A</span>Sim</div>
+      <div class="choice" onclick="pick(this,'q-ativa','nao')"><span class="badge">B</span>Não</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn2" onclick="checkAtiva()" disabled>Próximo →</button>
+      <button class="btn-back" onclick="go(1)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- DESQUALIFICADA -->
+  <div class="screen" id="s-disq">
+    <div class="disq-box">
+      <div class="icon">🌱</div>
+      <h2>Obrigada pela honestidade!</h2>
+      <p>Por enquanto esse conteúdo é voltado para consultoras dōTERRA ativas. Quando você iniciar sua jornada, vai ser muito bem-vinda! 💛</p>
+    </div>
+  </div>
+
+  <!-- ETAPA 3b: Nível de atuação -->
+  <div class="screen" id="s3">
+    <div class="step-label">Pergunta 3 de 9</div>
+    <div class="question">Hoje você trabalha com dōTERRA como:</div>
+    <div class="choices" id="q-nivel">
+      <div class="choice" onclick="pick(this,'q-nivel','renda-extra')"><span class="badge">A</span>Renda extra</div>
+      <div class="choice" onclick="pick(this,'q-nivel','principal')"><span class="badge">B</span>Principal fonte de renda</div>
+      <div class="choice" onclick="pick(this,'q-nivel','comecando')"><span class="badge">C</span>Estou começando agora</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn3" onclick="go(4)" disabled>Próximo →</button>
+      <button class="btn-back" onclick="go(2)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 4: WhatsApp -->
+  <div class="screen" id="s4">
+    <div class="step-label">Pergunta 4 de 9</div>
+    <div class="question">Qual o seu <em>WhatsApp</em>?</div>
+    <div class="subtitle">Vamos te chamar por aqui para explicar os próximos passos.</div>
+    <div class="field">
+      <input class="tf-input" id="q-whats" type="tel" placeholder="(00) 00000-0000" />
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn4" onclick="go(5)" disabled>Próximo →</button>
+      <button class="btn-back" onclick="go(3)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 5: Instagram -->
+  <div class="screen" id="s5">
+    <div class="step-label">Pergunta 5 de 9</div>
+    <div class="question">Qual o <em>@</em> do seu Instagram?</div>
+    <div class="field">
+      <input class="tf-input" id="q-insta" type="text" placeholder="@seuinstagram" />
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn5" onclick="go(6)" disabled>Próximo →</button>
+      <button class="btn-back" onclick="go(4)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 6: Nível dōTERRA -->
+  <div class="screen" id="s6">
+    <div class="step-label">Pergunta 6 de 9</div>
+    <div class="question">Hoje você está se qualificando em qual <em>nível de ranking</em> na dōTERRA?</div>
+    <div class="choices" id="q-rank">
+      <div class="choice" onclick="pick(this,'q-rank','consultora')"><span class="badge">A</span>Consultora</div>
+      <div class="choice" onclick="pick(this,'q-rank','elite')"><span class="badge">B</span>Elite</div>
+      <div class="choice" onclick="pick(this,'q-rank','premier')"><span class="badge">C</span>Premier</div>
+      <div class="choice" onclick="pick(this,'q-rank','silver')"><span class="badge">D</span>Silver</div>
+      <div class="choice" onclick="pick(this,'q-rank','gold')"><span class="badge">E</span>Gold</div>
+      <div class="choice" onclick="pick(this,'q-rank','platinum')"><span class="badge">F</span>Platinum</div>
+      <div class="choice" onclick="pick(this,'q-rank','diamond')"><span class="badge">G</span>Diamond</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn6" onclick="go(7)" disabled>Próximo →</button>
+      <button class="btn-back" onclick="go(5)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 7: Consciência de tráfego -->
+  <div class="screen" id="s7">
+    <div class="step-label">Pergunta 7 de 9</div>
+    <div class="question">Você sabe o que são <em>anúncios nas redes sociais</em> (tráfego pago)?</div>
+    <div class="choices" id="q-trafego">
+      <div class="choice" onclick="pick(this,'q-trafego','nao-sei')"><span class="badge">A</span>Não sei o que são os anúncios</div>
+      <div class="choice" onclick="pick(this,'q-trafego','sei-nunca')"><span class="badge">B</span>Sei o que é, mas nunca tive experiência</div>
+      <div class="choice" onclick="pick(this,'q-trafego','impulsionamento')"><span class="badge">C</span>Tive experiência de forma mais básica (impulsionamentos sazonais)</div>
+      <div class="choice" onclick="pick(this,'q-trafego','agencia')"><span class="badge">D</span>Já tive experiência com outra agência / assessoria / gestor</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn7" onclick="go(8)" disabled>Próximo →</button>
+      <button class="btn-back" onclick="go(6)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 8: Dor / origem de cadastros -->
+  <div class="screen" id="s8">
+    <div class="step-label">Pergunta 8 de 9</div>
+    <div class="question">Hoje, como você consegue a <em>maioria dos seus cadastros</em>?</div>
+    <div class="choices" id="q-origem">
+      <div class="choice" onclick="pick(this,'q-origem','indicacao')"><span class="badge">A</span>Indicação</div>
+      <div class="choice" onclick="pick(this,'q-origem','conteudo')"><span class="badge">B</span>Conteúdos do Instagram</div>
+      <div class="choice" onclick="pick(this,'q-origem','prospeccao')"><span class="badge">C</span>Prospecção direta</div>
+      <div class="choice" onclick="pick(this,'q-origem','eventos')"><span class="badge">D</span>Eventos / Collabs</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn8" onclick="go(9)" disabled>Próximo →</button>
+      <button class="btn-back" onclick="go(7)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 9: Qualificação financeira -->
+  <div class="screen" id="s9">
+    <div class="step-label">Pergunta 9 de 9</div>
+    <div class="question">Se você pudesse receber de <em>3 a 5 leads</em> por dia no seu WhatsApp investindo apenas <em>R$17,00/dia</em>. Estaria dentro do seu orçamento atual?</div>
+    <div class="qual-card">
+      <strong>🎯 Exemplo de lead que entraria em contato com você</strong>
+      <ul>
+        <li>Mulheres da sua cidade / região;</li>
+        <li>Que tenham condições de investimento;</li>
+        <li>Que sabem o que são óleos essenciais ou que buscam soluções naturais;</li>
+        <li>Que querem fazer uma transição de carreira;</li>
+        <li>Mulheres que têm o perfil de liderança e vendas;</li>
+      </ul>
+    </div>
+    <div class="choices" id="q-invest">
+      <div class="choice" onclick="pick(this,'q-invest','sim')"><span class="badge">A</span>Sim, tenho capacidade de investir esse valor</div>
+      <div class="choice" onclick="pick(this,'q-invest','nao')"><span class="badge">B</span>Não, ainda não estou disponível para investir isso por mês</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" id="btn9" onclick="finish()" disabled>Enviar →</button>
+      <button class="btn-back" onclick="go(8)">Voltar</button>
+    </div>
+  </div>
+
+  <!-- DESQUALIFICADA - SEM INVESTIMENTO -->
+  <div class="screen" id="s-disq2">
+    <div class="disq-box">
+      <div class="icon">💛</div>
+      <h2>Perfeito, entendi</h2>
+      <p>Como hoje a estratégia envolve um investimento mínimo em anúncios, não faz sentido avançarmos com a apresentação nesse momento.</p>
+      <p><strong>Mas quando você estiver pronta pra dar esse próximo passo, pode me chamar que te explico tudo com mais detalhes 😊</strong></p>
+    </div>
+  </div>
+
+  <!-- FINAL -->
+  <div class="screen" id="s-end">
+    <div class="end-box">
+      <div class="icon">💛</div>
+      <h2>Perfeito, <span id="nome-end"></span>!</h2>
+      <p>Pelo que você respondeu, faz todo sentido eu te apresentar a nossa metodologia DNA e como podemos aplicar ela no seu negócio com dōTERRA.</p>
+      <div class="highlight">📲 Vou te chamar pra te explicar de forma simples como podemos atrair esses leads qualificados todos os dias no seu Whatsapp</div>
+      <p style="font-size:13px;">Fique de olho nas mensagens! 🌿</p>
+    </div>
+  </div>
+
+  <div class="watermark">Criado por Bryan Natan - Trafficfy</div>
+</div>
+
+<script>
+  const TOTAL = 9;
+  const answers = {};
+
+  const progressMap = {
+    0: 0, 1: 10, 2: 20, 3: 30, 4: 40, 5: 50,
+    6: 60, 7: 70, 8: 80, 9: 90,
+    'disq': 100, 'end': 100
+  };
+
+  function go(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const id = typeof n === 'string' ? 's-' + n : 's' + n;
+    document.getElementById(id).classList.add('active');
+    const pct = progressMap[n] ?? 0;
+    document.getElementById('pbar').style.width = pct + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const primeiroNome = (answers['nome'] || '').split(' ')[0];
+    if (primeiroNome) {
+      const s2 = document.getElementById('nome-s2');
+      const send = document.getElementById('nome-end');
+      if (s2) s2.textContent = primeiroNome;
+      if (send) send.textContent = primeiroNome;
+    }
+  }
+
+  function pick(el, group, val) {
+    document.querySelectorAll('#' + group + ' .choice').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    answers[group] = val;
+    const autoAdvance = {
+      'q-ativa':   () => setTimeout(checkAtiva, 300),
+      'q-nivel':   () => setTimeout(() => go(4), 300),
+      'q-rank':    () => setTimeout(() => go(7), 300),
+      'q-trafego': () => setTimeout(() => go(8), 300),
+      'q-origem':  () => setTimeout(() => go(9), 300),
+      'q-invest':  () => setTimeout(finish, 300),
+    };
+    if (autoAdvance[group]) autoAdvance[group]();
+  }
+
+  function checkAtiva() {
+    if (answers['q-ativa'] === 'nao') go('disq');
+    else go(3);
+  }
+
+  function finish() {
+    if (answers['q-invest'] === 'nao') {
+      go('disq2');
+    } else {
+      go('end');
+    }
+
+    fetch('https://script.google.com/macros/s/AKfycbzLxfNjoyKKQHlJEWcMvXYYf8rImtbImtb6DlJYluZCUW5sSoguz8JGVeVON7Gk0eeKog/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(answers)
+    });
+  }
+
+  // Text inputs
+  function bindInput(inputId, btnId, answerKey) {
+    const input = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    input.addEventListener('input', () => {
+      answers[answerKey] = input.value.trim();
+      btn.disabled = !answers[answerKey];
+    });
+  }
+
+  bindInput('q-nome', 'btn1', 'nome');
+  bindInput('q-whats', 'btn4', 'whatsapp');
+  bindInput('q-insta', 'btn5', 'instagram');
+
+  // Instagram: auto-add @
+  const insta = document.getElementById('q-insta');
+  insta.addEventListener('blur', () => {
+    if (insta.value && !insta.value.startsWith('@')) insta.value = '@' + insta.value;
+    answers['instagram'] = insta.value.trim();
+  });
+
+  // WhatsApp mask
+  const whats = document.getElementById('q-whats');
+  whats.addEventListener('input', () => {
+    let v = whats.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0, 11);
+    if (v.length > 7) v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+    else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+    else if (v.length > 0) v = '(' + v;
+    whats.value = v;
+    answers['whatsapp'] = whats.value;
+    document.getElementById('btn4').disabled = whats.value.replace(/\D/g,'').length < 10;
+  });
+</script>
+</body>
+</html>
